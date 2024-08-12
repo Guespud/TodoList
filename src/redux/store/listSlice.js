@@ -3,7 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 export const listSlice = createSlice({
   name: "listSlice",
   initialState: {
-    data: false,
+    data: {
+      todo: [],
+      inProgress: [],
+      done: []
+  },
   },
   reducers: {
     setlistSlice: (state, action) => {
