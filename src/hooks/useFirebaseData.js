@@ -1,7 +1,8 @@
 import React from 'react';
-import { db, collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion,getDoc} from '../Firebase/firebaseConfig';
+import { db, collection, onSnapshot, doc, setDoc, updateDoc, arrayUnion, getDoc, arrayRemove } from '../Firebase/firebaseConfig';
 import { useSelector, useDispatch } from 'react-redux';
 import { setlistSlice } from '../redux/store/listSlice';
+import { VALUE_KEY_BD } from '../config/const';
 
 export const useFirebaseData = () => {
     const tasks = useSelector((store) => store?.setlistSlice?.data);
@@ -11,7 +12,6 @@ export const useFirebaseData = () => {
         const unsubscribe = onSnapshot(collection(db, 'data'), (snapshot) => {
             const tasksData = snapshot.docs.reduce((acc, doc) => {
                 const data = doc.data();
-                console.log(data);
                 acc.todo = data.todo || [];
                 acc.inProgress = data.inProgress || [];
                 acc.done = data.done || [];
@@ -35,12 +35,9 @@ export const useFirebaseData = () => {
 
         const [movedTask] = sourceColumn.splice(source.index, 1);
 
-        const updatedTask = {
-            ...movedTask,
-            status: destination.droppableId,
-        };
-
-        destColumn.splice(destination.index, 0, updatedTask);
+        if (!destColumn.some(task => task.id === movedTask.id)) {
+            destColumn.splice(destination.index, 0, movedTask);
+        }
 
         const updatedTasks = {
             ...tasks,
@@ -59,7 +56,7 @@ export const useFirebaseData = () => {
 
     const updateFirestoreCollection = async (tasksData) => {
         try {
-            const documentId = 'ElZ6qoBnDKFBnzcYtkBZ';
+            const documentId = VALUE_KEY_BD;
             await setDoc(doc(db, 'data', documentId), tasksData, { merge: true });
         } catch (error) {
             console.error('Error updating Firestore:', error);
@@ -68,7 +65,7 @@ export const useFirebaseData = () => {
 
     const createNewTodo = async (newTask) => {
         try {
-            const documentId = 'ElZ6qoBnDKFBnzcYtkBZ'; 
+            const documentId = VALUE_KEY_BD;
             const dataDocRef = doc(db, 'data', documentId);
             const docSnap = await getDoc(dataDocRef);
 
@@ -81,14 +78,13 @@ export const useFirebaseData = () => {
 
                 let newTodo = {
                     ...newTask,
-                    id: `list${totalList + 1}`, // Generar un nuevo ID basado en el conteo
+                    id: `list${totalList + 1}`,
                     status: "todo"
                 };
 
                 await updateDoc(dataDocRef, {
                     todo: arrayUnion(newTodo)
                 });
-
                 console.log('Nueva tarea añadida a todo exitosamente!');
             } else {
                 console.log('No existe el documento en Firestore.');
@@ -98,8 +94,46 @@ export const useFirebaseData = () => {
         }
     };
 
+    const deleteTodo = async (data) => {
+        try {
+            const documentId = VALUE_KEY_BD;
+            const dataDocRef = doc(db, 'data', documentId);
+            const docSnap = await getDoc(dataDocRef);
+
+            if (docSnap.exists()) {
+                const currentTasks = docSnap.data();
+                const states = ['todo', 'inProgress', 'done'];
+
+                let taskFound = false;
+
+                for (const state of states) {
+                    const tasks = currentTasks[state] || [];
+
+                    const taskToDelete = tasks.find(task => task.id === data.id);
+
+                    if (taskToDelete) {
+                        await updateDoc(dataDocRef, {
+                            [state]: arrayRemove(taskToDelete)
+                        });
+                        taskFound = true;
+                        break;
+                    }
+                }
+                if (!taskFound) {
+                    console.error('Tarea no encontrada en ninguna lista.');
+                }
+            } else {
+                console.error('Documento no encontrado en Firestore.');
+            }
+        } catch (error) {
+            console.error('Error al eliminar la tarea:', error);
+        }
+    };
+
+
     return {
         onDragEnd,
-        createNewTodo
+        createNewTodo,
+        deleteTodo
     };
 };

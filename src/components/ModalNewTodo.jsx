@@ -1,36 +1,34 @@
 import { useForm } from "react-hook-form";
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useFirebaseData } from "../hooks/useFirebaseData";
 
 // eslint-disable-next-line react/prop-types
 export const ModalNewTodo = ({ open, setOpen }) => {
 
-    const { register, handleSubmit,reset } = useForm();
-    const {createNewTodo} =useFirebaseData()
-   
-    const onSubmit = (data) =>{
-        createNewTodo(data)
-        setOpen(false)
-        reset()
-        
+    const { register, handleSubmit, reset } = useForm();
+    const { createNewTodo } = useFirebaseData();
+
+    const onSubmit = (data) => {
+        createNewTodo(data);
+        setOpen(false);
+        reset();
     }
 
-
     return (
-        <Dialog open={open} onClose={setOpen} className="relative z-10">
+        <Dialog open={open} onClose={() => setOpen(false)} className="relative z-10">
             <DialogBackdrop
                 transition
-                className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+                className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
             />
 
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div className="flex min-h-full items-center justify-center p-4 text-center">
                     <DialogPanel
                         transition
-                        className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+                        className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg"
                     >
                         <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                            <div className="sm:flex sm:items-start">
+                            <div className="">
                                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                     <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                                         Nueva Tarea
@@ -38,38 +36,42 @@ export const ModalNewTodo = ({ open, setOpen }) => {
                                     <div className="mt-2">
                                         <form onSubmit={handleSubmit(onSubmit)}>
                                             <div className="mb-4">
-                                                <label className="block text-gray-700 text-sm font-bold mb-2" >
+                                                <label className="block text-gray-700 text-sm font-bold mb-2">
                                                     Titulo
                                                 </label>
-                                                <input {...register("title",{ required: "El titulo es obligatorio" })} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                                                <input
+                                                    {...register("title", { required: "El titulo es obligatorio" })}
+                                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                />
                                             </div>
                                             <div className="mb-6">
-                                                <label className="block text-gray-700 text-sm font-bold mb-2" >
+                                                <label className="block text-gray-700 text-sm font-bold mb-2">
                                                     Descripción
                                                 </label>
-                                                <input {...register("description",{ required: "La descripción es obligatoria" })}className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                                                <input
+                                                    {...register("description", { required: "La descripción es obligatoria" })}
+                                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end gap-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setOpen(false)}
+                                                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:w-auto"
+                                                >
+                                                    Agregar
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                            <button
-                                type="button"
-                                onClick={handleSubmit(onSubmit)}
-                                className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
-                            >
-                                Agregar
-                            </button>
-                            <button
-                                type="button"
-                                data-autofocus
-                                onClick={() => setOpen(false)}
-                                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                            >
-                                Cancelar
-                            </button>
                         </div>
                     </DialogPanel>
                 </div>

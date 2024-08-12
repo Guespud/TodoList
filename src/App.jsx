@@ -9,9 +9,11 @@ export const App = () => {
     <div className="min-h-screen bg-slate-300 p-8">
       <div className="flex justify-between items-center mb-8">
         <div className="flex-1 flex justify-center">
-          <h1 className="text-7xl font-bold text-white">Lista de tareas</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white">
+            Lista de tareas
+          </h1>
         </div>
-        <button className=" text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={()=>setOpen(true)}>
+        <button className=" text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={() => setOpen(true)}>
           <img src={expediente} alt="" width={50} />
         </button>
       </div>
