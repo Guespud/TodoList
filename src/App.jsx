@@ -4,7 +4,7 @@ import expediente from './assets/images/expediente.png'
 import { ModalNewTodo } from './components/ModalNewTodo';
 
 export const App = () => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState({ status: false, view: "",id:"" })
   return (
     <div className="min-h-screen bg-slate-300 p-8">
       <div className="flex justify-between items-center mb-8">
@@ -13,7 +13,7 @@ export const App = () => {
             Lista de tareas
           </h1>
         </div>
-        <button className=" text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={() => setOpen(true)}>
+        <button className=" text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={() => setOpen({ status: true, view:"create" })}>
           <img src={expediente} alt="" width={50} />
         </button>
       </div>

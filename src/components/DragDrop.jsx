@@ -1,11 +1,15 @@
+import React from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useFirebaseData } from '../hooks/useFirebaseData';
 import { useSelector } from 'react-redux';
 import Delete from '../assets/images/delete.png';
+import Edit from '../assets/images/edit.png';
+import { ModalNewTodo } from './ModalNewTodo';
 
 export const DragDrop = () => {
     const tasks = useSelector((store) => store?.setlistSlice?.data);
     const { onDragEnd, deleteTodo } = useFirebaseData();
+    const [open, setOpen] = React.useState({ status: false, view: "", id: "" })
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -38,12 +42,20 @@ export const DragDrop = () => {
                                                         {task.description}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    className="text-red-600 bg-transparent border-none cursor-pointer hover:text-red-800"
-                                                    onClick={() => deleteTodo(task)}
-                                                >
-                                                    <img src={Delete} width={30} alt="Eliminar" />
-                                                </button>
+                                                <div className="flow-root">
+                                                    <button
+                                                        className="text-red-600 bg-transparent border-none cursor-pointer hover:text-red-800"
+                                                        onClick={() => deleteTodo(task)}
+                                                    >
+                                                        <img src={Delete} width={30} alt="Eliminar" />
+                                                    </button>
+                                                    <button
+                                                        className="text-red-600 bg-transparent border-none cursor-pointer hover:text-red-800"
+                                                        onClick={() => setOpen({ status: true, view: "edit", id: task.id })}
+                                                    >
+                                                        <img src={Edit} width={30} alt="Editar" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </Draggable>
@@ -54,6 +66,10 @@ export const DragDrop = () => {
                     </Droppable>
                 ))}
             </div>
+            <ModalNewTodo
+                open={open}
+                setOpen={setOpen}
+            />
         </DragDropContext>
     );
 };

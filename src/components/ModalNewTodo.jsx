@@ -1,21 +1,42 @@
+/* eslint-disable react/prop-types */
+// eslint-disable-next-line react/prop-types
+import React from "react";
 import { useForm } from "react-hook-form";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useFirebaseData } from "../hooks/useFirebaseData";
 
-// eslint-disable-next-line react/prop-types
 export const ModalNewTodo = ({ open, setOpen }) => {
 
-    const { register, handleSubmit, reset } = useForm();
-    const { createNewTodo } = useFirebaseData();
+    const { register, handleSubmit, reset, setValue } = useForm();
+    const { createNewTodo, updateTodo, getTodoById } = useFirebaseData();
 
     const onSubmit = (data) => {
-        createNewTodo(data);
-        setOpen(false);
+        if (open?.view == "edit") {
+            updateTodo({ ...data, id: open?.id });
+        } else {
+            createNewTodo(data);
+        }
+        setOpen({ view: "", status: false });
         reset();
     }
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (open?.view === "edit") {
+                const dataEdit = await getTodoById(open?.id);
+                if (dataEdit) {
+                    setValue('title', dataEdit.title);
+                    setValue('description', dataEdit.description);
+                }
+            } else {
+                reset();
+            }
+        };
+        fetchData();
+    }, [open?.id]);
+
 
     return (
-        <Dialog open={open} onClose={() => setOpen(false)} className="relative z-10">
+        <Dialog open={open?.status} onClose={() => setOpen({ ...open, status: false })} className="relative z-10">
             <DialogBackdrop
                 transition
                 className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
@@ -31,7 +52,7 @@ export const ModalNewTodo = ({ open, setOpen }) => {
                             <div className="">
                                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                     <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                                        Nueva Tarea
+                                        {open?.view == "edit" ? "Editar Tarea" : "Nueva Tarea"}
                                     </DialogTitle>
                                     <div className="mt-2">
                                         <form onSubmit={handleSubmit(onSubmit)}>
@@ -56,7 +77,7 @@ export const ModalNewTodo = ({ open, setOpen }) => {
                                             <div className="flex justify-end gap-4">
                                                 <button
                                                     type="button"
-                                                    onClick={() => setOpen(false)}
+                                                    onClick={() => setOpen({ ...open, status: false })}
                                                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                                 >
                                                     Cancelar

@@ -130,10 +130,78 @@ export const useFirebaseData = () => {
         }
     };
 
+    const updateTodo = async (data) => {
+        try {
+            const documentId = VALUE_KEY_BD;
+            const dataDocRef = doc(db, 'data', documentId);
+            const docSnap = await getDoc(dataDocRef);
+
+            if (docSnap.exists()) {
+                const currentTasks = docSnap.data();
+                const states = ['todo', 'inProgress', 'done'];
+
+                let taskFound = false;
+
+                for (const state of states) {
+                    const tasks = currentTasks[state] || [];
+
+                    const taskIndex = tasks.findIndex(task => task.id === data.id);
+
+                    if (taskIndex !== -1) {
+                        tasks[taskIndex] = data;
+                        await updateDoc(dataDocRef, {
+                            [state]: tasks
+                        });
+                        taskFound = true;
+                        break;
+                    }
+                }
+
+                if (!taskFound) {
+                    console.error('Tarea no encontrada en ninguna lista.');
+                }
+            } else {
+                console.error('Documento no encontrado en Firestore.');
+            }
+        } catch (error) {
+            console.error('Error al actualizar la tarea:', error);
+        }
+    };
+
+    const getTodoById = async (id) => {
+        try {
+            const documentId = VALUE_KEY_BD;
+            const dataDocRef = doc(db, 'data', documentId);
+            const docSnap = await getDoc(dataDocRef);
+
+            if (docSnap.exists()) {
+                const currentTasks = docSnap.data();
+                const states = ['todo', 'inProgress', 'done'];
+
+                for (const state of states) {
+                    const task = currentTasks[state]?.find(task => task.id === id);
+                    if (task) {
+                        return task;
+                    }
+                }
+                console.error('Tarea no encontrada.');
+                return null;
+            } else {
+                console.error('Documento no encontrado en Firestore.');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error al obtener la tarea por ID:', error);
+            return null;
+        }
+    };
+
 
     return {
         onDragEnd,
         createNewTodo,
-        deleteTodo
+        deleteTodo,
+        updateTodo,
+        getTodoById
     };
 };
